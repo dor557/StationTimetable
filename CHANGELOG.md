@@ -9,6 +9,7 @@ Initial public Alpha release.
 - Added Vanilla foreground, auxiliary, and background color support.
 - Added emissive and glossiness settings.
 - Added blueprint-safe station linking and multiplayer replication.
-- Added Windows, Windows dedicated-server, and Linux dedicated-server support.
+- Added Windows client support for Steam and Epic Games Store.
+- Dedicated-server packaging remains disabled until practical server testing is complete.
 - Changed runtime timetable updates to reuse existing widgets and avoid continuous UObject growth.
 - Added English as native language and prepared German localization.

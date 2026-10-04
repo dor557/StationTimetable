@@ -28,13 +28,13 @@ Copyright (C) 2026 dor557. Licensed under the GNU General Public License v3.0 on
 - Supports three Vanilla sign colors, emissive intensity and matte/glossy material settings.
 - Updates the existing rendered widget in place without continuously creating sign presets.
 - Supports blueprint placement without copying a station reference.
-- Supports multiplayer and dedicated-server targets.
+- Supports Windows clients and listen-server multiplayer.
 - Unlocks with the same Tier 6 train milestone that unlocks the Vanilla Train Station.
 - Uses the Vanilla billboard recipe ingredients and construction cost.
 
 ## Build Targets
 
-Alpakit is configured for `Windows`, `WindowsServer` and `LinuxServer`.
+The public Alpha package is configured for the `Windows` client target only. Dedicated-server targets remain disabled until practical server testing is complete.
 
 Do not add a `GameFeature` field to the source `.uplugin`. Alpakit adds it to packaged releases and installs the mod below `FactoryGame/Mods/GameFeatures/StationTimetable`.
 
@@ -75,7 +75,7 @@ Do not create a Game localization target. Plugin localization targets are packag
 
 1. Update `Version`, `VersionName`, and `SemVersion` consistently.
 2. Update `GameVersion` and the SML dependency to the versions actually tested.
-3. Compile and test Steam, Epic, Windows dedicated server, and Linux dedicated server.
+3. Compile and test Steam and Epic clients.
 4. Test host/client color editing, blueprint copy/paste, and save/load behavior.
 5. Gather and compile localization after the final asset text changes.
 6. Package all targets with Alpakit Release.
@@ -88,3 +88,4 @@ Do not create a Game localization target. Plugin localization targets are packag
 - Minimum game build: `502094`
 - Required SML range: `^3.12.0`
 - Multiplayer: required on host and client
+- Dedicated servers: not included in the current Alpha package
