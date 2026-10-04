@@ -1,0 +1,41 @@
+{
+  "FileVersion": 3,
+  "Version": 0,
+  "VersionName": "0.2.1",
+  "SemVersion": "0.2.1",
+  "GameVersion": ">=502094",
+  "RequiredOnRemote": true,
+  "FriendlyName": "Train & Station Displays",
+  "Description": "Adds customizable station displays showing upcoming trains, destinations, status information, and estimated arrival times.",
+  "Category": "Transportation",
+  "CreatedBy": "dor557",
+  "CreatedByURL": "https://ficsit.app/user/SykzxA5sax2zK",
+  "DocsURL": "https://www.the-microborgs.de/mods/",
+  "SupportURL": "https://www.the-microborgs.de/mods/",
+  "CanContainContent": true,
+  "IsBetaVersion": true,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "BuiltInInitialFeatureState": "Active",
+  "LocalizationTargets": [
+    {
+      "Name": "StationTimetable",
+      "LoadingPolicy": "Always",
+      "ConfigGenerationPolicy": "Never"
+    }
+  ],
+  "Modules": [
+    {
+      "Name": "StationTimetable",
+      "Type": "Runtime",
+      "LoadingPhase": "PostDefault"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "SML",
+      "Enabled": true,
+      "SemVersion": "^3.12.0"
+    }
+  ]
+}

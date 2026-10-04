@@ -1,0 +1,32 @@
+# Unreal build output
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+
+# Generated packages and archives
+Build/
+Dist/
+*.smod
+*.zip
+*.pak
+*.ucas
+*.utoc
+
+# IDE and local tooling
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+*.user
+*.VC.db
+*.VC.opendb
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local diagnostic screenshots
+Screenshot 2026-09-25 201003.png
