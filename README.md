@@ -44,12 +44,12 @@ The internal stage is configured in `Source/StationTimetable/Public/StationTimet
 
 ```cpp
 inline constexpr EStationTimetableReleaseStage StationTimetableReleaseStage =
-    EStationTimetableReleaseStage::Development;
+    EStationTimetableReleaseStage::Alpha;
 ```
 
 Available stages are `Development`, `Alpha`, `Beta` and `Release`.
 
-The UObject HUD, creation listener and verbose development logs are active only in `Development`. Before creating an Alpha, Beta or Release package, change this constant to the matching stage. Errors required for troubleshooting remain logged.
+The UObject HUD, creation listener and verbose development logs are active only in `Development`. The current public package stage is `Alpha`; errors required for troubleshooting remain logged.
 
 The internal build number is independent of the public semantic version and is not shown outside Development builds.
 
@@ -73,18 +73,18 @@ Do not create a Game localization target. Plugin localization targets are packag
 
 ## Publication Checklist
 
-1. Set the internal release stage to `Alpha`, `Beta`, or `Release`.
-2. Update `Version`, `VersionName`, and `SemVersion` consistently.
-3. Update `GameVersion` and the SML dependency to the versions actually tested.
-4. Compile and test Steam, Epic, Windows dedicated server, and Linux dedicated server.
-5. Test host/client color editing, blueprint copy/paste, and save/load behavior.
-6. Gather and compile localization after the final asset text changes.
-7. Package all targets with Alpakit Release.
-8. Upload the combined multi-target archive to ficsit.app and test installation through Satisfactory Mod Manager.
+1. Update `Version`, `VersionName`, and `SemVersion` consistently.
+2. Update `GameVersion` and the SML dependency to the versions actually tested.
+3. Compile and test Steam, Epic, Windows dedicated server, and Linux dedicated server.
+4. Test host/client color editing, blueprint copy/paste, and save/load behavior.
+5. Gather and compile localization after the final asset text changes.
+6. Package all targets with Alpakit Release.
+7. Upload the combined multi-target archive to ficsit.app with stability `Alpha` and test installation through Satisfactory Mod Manager.
 
 ## Current Public Version
 
 - Semantic version: `0.2.1`
+- Release stage: `Alpha`
 - Minimum game build: `502094`
 - Required SML range: `^3.12.0`
 - Multiplayer: required on host and client

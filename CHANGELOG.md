@@ -2,6 +2,8 @@
 
 ## 0.2.1
 
+Initial public Alpha release.
+
 - Added a station-bound timetable based on the Vanilla small billboard.
 - Added next-train and additional-service information with status icons and estimated arrival times.
 - Added Vanilla foreground, auxiliary, and background color support.
