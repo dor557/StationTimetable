@@ -302,6 +302,26 @@ namespace
     };
 
     TUniquePtr<FStationTimetableUObjectCreationListener> UObjectCreationListener;
+
+#if UE_SERVER
+    FTSTicker::FDelegateHandle DedicatedServerUObjectTickerHandle;
+    int32 LastDedicatedServerUObjectCount = 0;
+
+    bool ReportDedicatedServerUObjects(float DeltaTime)
+    {
+        const int32 LiveObjectCount = GUObjectArray.GetObjectArrayNumMinusAvailable();
+        const int32 ObjectSlots = GUObjectArray.GetObjectArrayNum();
+        const int32 ObjectDelta = LiveObjectCount - LastDedicatedServerUObjectCount;
+        LastDedicatedServerUObjectCount = LiveObjectCount;
+        UE_LOG(LogStationTimetable, Display,
+            TEXT("Dedicated server UObjects/5min live=%d delta=%+d slots=%d available=%d"),
+            LiveObjectCount,
+            ObjectDelta,
+            ObjectSlots,
+            GUObjectArray.GetObjectArrayEstimatedAvailable());
+        return true;
+    }
+#endif
 }
 
 void FStationTimetableModule::StartupModule()
@@ -317,6 +337,14 @@ void FStationTimetableModule::StartupModule()
         UObjectCreationListener = MakeUnique<FStationTimetableUObjectCreationListener>();
         UObjectCreationListener->Start();
     }
+#if UE_SERVER
+    if constexpr (StationTimetableDevelopmentDiagnostics)
+    {
+        LastDedicatedServerUObjectCount = GUObjectArray.GetObjectArrayNumMinusAvailable();
+        DedicatedServerUObjectTickerHandle = FTSTicker::GetCoreTicker().AddTicker(
+            FTickerDelegate::CreateStatic(&ReportDedicatedServerUObjects), 300.0f);
+    }
+#endif
 
 #if !WITH_EDITOR && !UE_SERVER
     UClass* VanillaHologramClass = LoadClass<AFGStandaloneSignHologram>(
@@ -360,6 +388,13 @@ void FStationTimetableModule::StartupModule()
 
 void FStationTimetableModule::ShutdownModule()
 {
+#if UE_SERVER
+    if (DedicatedServerUObjectTickerHandle.IsValid())
+    {
+        FTSTicker::GetCoreTicker().RemoveTicker(DedicatedServerUObjectTickerHandle);
+        DedicatedServerUObjectTickerHandle.Reset();
+    }
+#endif
     if (UObjectCreationListener)
     {
         UObjectCreationListener->Stop();

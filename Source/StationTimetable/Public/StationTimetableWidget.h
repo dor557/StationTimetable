@@ -23,6 +23,8 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Station Timetable")
     void SetTimetableData(const FPrefabSignData& InData);
 
+    void SetRuntimeTimetableData(const FPrefabSignData& InData);
+
     UFUNCTION(BlueprintCallable, Category = "Station Timetable")
     void UpdateTimetable(const FStationTimetableDisplayData& Data);
 
@@ -75,4 +77,5 @@ private:
     UPROPERTY(meta = (BindWidgetOptional)) TObjectPtr<UImage> OtherStatus4;
     UPROPERTY(meta = (BindWidgetOptional)) TObjectPtr<UStationTimetableMarquee> OtherTrainName4;
     UPROPERTY(Transient) TObjectPtr<UTextBlock> OtherEtaText4;
+    bool bUsesRuntimeTimetableData = false;
 };

@@ -1,0 +1,153 @@
+﻿# StationTimetable German translation.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: StationTimetable\n"
+"POT-Creation-Date: 2026-10-04 20:13\n"
+"PO-Revision-Date: 2026-10-04 20:13\n"
+"Language-Team: \n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Key:	AA2DFED94CF34CDFED629BB3839FD06D
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.EmptyStateText0.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.EmptyStateText0.Text
+msgctxt ",AA2DFED94CF34CDFED629BB3839FD06D"
+msgid "No trains available"
+msgstr "Keine Zugverbindungen"
+
+#. Key:	TextBlockDefaultValue
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextDestination0.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextDestination0.Text
+msgctxt "UMG,TextBlockDefaultValue"
+msgid "Text Block"
+msgstr "standard"
+
+#. Key:	E257DE46437D4BA945A9B9A9BECD8FBF
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextDestinationLabel0.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextDestinationLabel0.Text
+msgctxt ",E257DE46437D4BA945A9B9A9BECD8FBF"
+msgid "Destination"
+msgstr "Nächstes Ziel"
+
+#. Key:	7E31E70B44DEBFB2A610AE89F6FBF6DF
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextEta0.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextEta0.Text
+msgctxt ",7E31E70B44DEBFB2A610AE89F6FBF6DF"
+msgid "5 min"
+msgstr "5 min"
+
+#. Key:	83BA69704EFE0BA051B391A7D0569FC9
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextEtaLabel0.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextEtaLabel0.Text
+msgctxt ",83BA69704EFE0BA051B391A7D0569FC9"
+msgid "Arrival in"
+msgstr "Ankunft ca."
+
+#. Key:	829C5352449DA2C51D75959CF929BA37
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextSectionTitle0.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.NextSectionTitle0.Text
+msgctxt ",829C5352449DA2C51D75959CF929BA37"
+msgid "Next train"
+msgstr "Nächster zug"
+
+#. Key:	D7EA7A0143881EDEE229D7BD265CC329
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherEta1_.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherEta1_.Text
+msgctxt ",D7EA7A0143881EDEE229D7BD265CC329"
+msgid "1 min"
+msgstr "1 min"
+
+#. Key:	B7694E9B496FE3A34D456EB3CF0F96AA
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherEta2_.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherEta2_.Text
+msgctxt ",B7694E9B496FE3A34D456EB3CF0F96AA"
+msgid "3 min"
+msgstr "3 min"
+
+#. Key:	4FD164A84296A46694E0D69E3227D375
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherEta3_.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherEta3_.Text
+msgctxt ",4FD164A84296A46694E0D69E3227D375"
+msgid "6 min"
+msgstr "6 min"
+
+#. Key:	71DA2290415775C2B484F689737A7554
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherEta4_.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherEta4_.Text
+msgctxt ",71DA2290415775C2B484F689737A7554"
+msgid "8 min"
+msgstr "8 min"
+
+#. Key:	F38F0D7C47D9F9368D37298CB17BF564
+#. SourceLocation:	/StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherSectionTitle0.Text
+#: /StationTimetable/Widgets/WBP_StationTimetableRenderer.WBP_StationTimetableRenderer_C:WidgetTree.OtherSectionTitle0.Text
+msgctxt ",F38F0D7C47D9F9368D37298CB17BF564"
+msgid "Additional trains"
+msgstr "Weitere Züge"
+
+#. Key:	BuildableName
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(120)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(120)
+msgctxt "StationTimetable,BuildableName"
+msgid "Station Timetable"
+msgstr "Bahnhofsfahrplan"
+
+#. Key:	BuildableDescription
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(121)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(121)
+msgctxt "StationTimetable,BuildableDescription"
+msgid "Displays the train services of the nearest station."
+msgstr "Zeigt die Zugverbindungen des nächsten Bahnhofs"
+
+#. Key:	NoStationConnected
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(426)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(426)
+msgctxt "StationTimetable,NoStationConnected"
+msgid "NO STATION CONNECTED"
+msgstr "KEIN BAHNHOF IN REICHWEITE"
+
+#. Key:	UnknownDestination
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(452)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(452)
+msgctxt "StationTimetable,UnknownDestination"
+msgid "Unknown"
+msgstr "unbekannt"
+
+#. Key:	ThisStation
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(488)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableBuildable.cpp(488)
+msgctxt "StationTimetable,ThisStation"
+msgid "This station"
+msgstr "Dieser Bahnhof"
+
+#. Key:	DisplayName
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableContent.cpp(26)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableContent.cpp(26)
+msgctxt "StationTimetable,DisplayName"
+msgid "Station Timetable"
+msgstr "Bahnhofsfahrplan"
+
+#. Key:	Description
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableContent.cpp(27)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableContent.cpp(27)
+msgctxt "StationTimetable,Description"
+msgid "A small billboard displaying the train services linked to a station."
+msgstr "Eine kleine Anzeigetafel für die Zugverbindungen eines Bahnhofs."
+
+#. Key:	RecipeName
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableContent.cpp(55)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableContent.cpp(55)
+msgctxt "StationTimetable,RecipeName"
+msgid "Station Timetable"
+msgstr "Bahnhofsfahrplan"
+
+#. Key:	NoStation
+#. SourceLocation:	Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableContent.cpp(78)
+#: Mods/GameFeatures/StationTimetable/Source/StationTimetable/Private/StationTimetableContent.cpp(78)
+msgctxt "StationTimetable,NoStation"
+msgid "Must be placed within 5 m of a station boundary"
+msgstr "Muss innerhalb von 5 m Reichweite eines Bahnhofs bebaut werden"

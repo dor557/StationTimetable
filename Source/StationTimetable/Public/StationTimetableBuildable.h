@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Buildables/FGBuildableWidgetSign.h"
+#include "StationTimetableDisplayData.h"
 #include "StationTimetableBuildable.generated.h"
 
 class AFGBuildableRailroadStation;
@@ -34,13 +35,12 @@ public:
 private:
     void RefreshTimetableData();
     bool IsSignEditorOpen() const;
-#if !UE_SERVER
-    bool UpdateRenderedTimetable(const FPrefabSignData& SignData);
-    void SetRendererDiagnosticState(uint8 NewState, const TCHAR* Description);
-#endif
 
     UFUNCTION()
     void OnRep_LinkedStation();
+
+    UFUNCTION()
+    void OnRep_TimetableRevision();
 
     UPROPERTY()
     TSoftClassPtr<UFGSignPrefabWidget> TimetableWidgetLayout;
@@ -54,13 +54,20 @@ private:
     UPROPERTY(SaveGame, ReplicatedUsing = OnRep_LinkedStation)
     TObjectPtr<AFGBuildableRailroadStation> LinkedStation;
 
+    UPROPERTY(Replicated)
+    FStationTimetableDisplayData ReplicatedTimetableData;
+
+    UPROPERTY(ReplicatedUsing = OnRep_TimetableRevision)
+    uint32 TimetableRevision = 0;
+
     TObjectPtr<AFGBuildableRailroadStation> LinkedStationBeforeBlueprintSerialization;
 
     TMap<FString, FString> LastPublishedTimetableData;
     bool bHasPublishedTimetableData = false;
     bool bRefreshPausedForInteraction = false;
+    double LastTimetablePublishTimeSeconds = -TNumericLimits<double>::Max();
 #if !UE_SERVER
-    uint8 RendererDiagnosticState = MAX_uint8;
+    uint32 LastObservedClientRevision = MAX_uint32;
 #endif
     FTimerHandle RefreshTimer;
 };

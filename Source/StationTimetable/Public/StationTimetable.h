@@ -16,8 +16,8 @@ enum class EStationTimetableReleaseStage : uint8
 inline constexpr EStationTimetableReleaseStage StationTimetableReleaseStage = EStationTimetableReleaseStage::Alpha;
 inline constexpr bool StationTimetableDevelopmentDiagnostics =
     StationTimetableReleaseStage == EStationTimetableReleaseStage::Development;
-inline constexpr int32 StationTimetableBuildNumber = 123;
-inline constexpr const TCHAR* StationTimetableVersion = TEXT("0.2.1");
+inline constexpr int32 StationTimetableBuildNumber = 125;
+inline constexpr const TCHAR* StationTimetableVersion = TEXT("0.2.4");
 
 #define STATION_TIMETABLE_DEV_LOG(Verbosity, Format, ...) \
     do { if constexpr (StationTimetableDevelopmentDiagnostics) { \

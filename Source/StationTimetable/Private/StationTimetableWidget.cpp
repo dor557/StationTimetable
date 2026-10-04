@@ -102,6 +102,16 @@ void UStationTimetableWidget::SetTimetableData(const FPrefabSignData& InData)
     if (!bUnchanged || !StationName) UpdateTimetable(FStationTimetableDisplayData::FromSignData(InData));
 }
 
+void UStationTimetableWidget::SetRuntimeTimetableData(const FPrefabSignData& InData)
+{
+    bUsesRuntimeTimetableData = true;
+    if (TimetableRenderer && TimetableRenderer != this)
+    {
+        TimetableRenderer->bUsesRuntimeTimetableData = true;
+    }
+    SetTimetableData(InData);
+}
+
 void UStationTimetableWidget::UpdateTimetable(const FStationTimetableDisplayData& Data)
 {
     if (TimetableRenderer && TimetableRenderer != this)
@@ -186,6 +196,7 @@ UTexture2D* UStationTimetableWidget::GetStatusTexture(EStationTimetableTrainStat
 void UStationTimetableWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
+    if (bUsesRuntimeTimetableData) return;
     if (TimetableRenderer && TimetableRenderer != this)
     {
         if (!mPrefabSignData.TextElementData.IsEmpty()) TimetableRenderer->SetTimetableData(mPrefabSignData);

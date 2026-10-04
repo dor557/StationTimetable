@@ -2,9 +2,7 @@
 
 #include "Buildables/FGBuildableRailroadStation.h"
 #include "Blueprint/UserWidget.h"
-#include "Blueprint/WidgetTree.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/WidgetComponent.h"
 #include "Engine/StaticMesh.h"
 #include "EngineUtils.h"
 #include "FGRailroadSubsystem.h"
@@ -13,7 +11,6 @@
 #include "FGTrainStationIdentifier.h"
 #include "FGColoredInstanceMeshProxy.h"
 #include "FGHUD.h"
-#include "FGSignSubsystem.h"
 #include "UI/FGGameUI.h"
 #include "UI/FGInteractWidget.h"
 #include "Hologram/FGStandaloneSignHologram.h"
@@ -22,7 +19,6 @@
 #include "StationTimetable.h"
 #include "StationTimetableContent.h"
 #include "StationTimetableDisplayData.h"
-#include "StationTimetableWidget.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/UnrealType.h"
 
@@ -37,6 +33,7 @@ namespace
         AFGTrain* Train = nullptr;
         bool DockedHere = false;
         bool HeadsHere = false;
+        bool DestinationIsConnectedStation = false;
         float EstimatedSeconds = TNumericLimits<float>::Max();
         FString NextStop;
     };
@@ -44,27 +41,7 @@ namespace
     constexpr float EstimatedTravelSpeed = 1200.0f;
     constexpr float RouteDistanceFactor = 1.15f;
     constexpr float StandardStationWaitSeconds = 30.0f;
-
-#if !UE_SERVER
-    UStationTimetableWidget* FindTimetableWidget(UUserWidget* RootWidget)
-    {
-        if (!RootWidget) return nullptr;
-        if (UStationTimetableWidget* Timetable = Cast<UStationTimetableWidget>(RootWidget)) return Timetable;
-        if (!RootWidget->WidgetTree) return nullptr;
-
-        TArray<UWidget*> Widgets;
-        RootWidget->WidgetTree->GetAllWidgets(Widgets);
-        for (UWidget* Widget : Widgets)
-        {
-            if (UStationTimetableWidget* Timetable = Cast<UStationTimetableWidget>(Widget)) return Timetable;
-            if (UUserWidget* NestedWidget = Cast<UUserWidget>(Widget))
-            {
-                if (UStationTimetableWidget* Timetable = FindTimetableWidget(NestedWidget)) return Timetable;
-            }
-        }
-        return nullptr;
-    }
-#endif
+    constexpr double MinimumSignPublishIntervalSeconds = 30.0;
 
     int32 FindStopIndex(const TArray<FTimeTableStop>& Stops, int32 StartIndex, const AFGTrainStationIdentifier* Station)
     {
@@ -136,12 +113,10 @@ AStationTimetableBuildable::AStationTimetableBuildable()
     TimetableFrameMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StationTimetableFrame"));
     TimetableFrameMesh->SetMobility(EComponentMobility::Static);
     TimetableFrameMesh->SetupAttachment(RootComponent);
-#if !UE_SERVER
     static ConstructorHelpers::FClassFinder<AFGStandaloneSignHologram> VanillaSignHologram(
         TEXT("/Game/FactoryGame/Buildable/Factory/-Shared/Holo_StandaloneSign_Large")
     );
     if (VanillaSignHologram.Succeeded()) mHologramClass = VanillaSignHologram.Class;
-#endif
     mDisplayName = NSLOCTEXT("StationTimetable", "BuildableName", "Station Timetable");
     mDescription = NSLOCTEXT("StationTimetable", "BuildableDescription", "Displays the train services of the nearest station.");
 
@@ -310,7 +285,13 @@ void AStationTimetableBuildable::BeginPlay()
         }
     }
     RefreshTimetableData();
-    GetWorldTimerManager().SetTimer(RefreshTimer, this, &AStationTimetableBuildable::RefreshTimetableData, 2.0f, true);
+    GetWorldTimerManager().SetTimer(
+        RefreshTimer,
+        this,
+        &AStationTimetableBuildable::RefreshTimetableData,
+        2.0f,
+        true,
+        0.25f);
     STATION_TIMETABLE_DEV_LOG(Display, TEXT("Display %s linkedStation=%s uses Vanilla sign renderer"), *GetName(), *GetNameSafe(LinkedStation));
 }
 
@@ -329,11 +310,44 @@ void AStationTimetableBuildable::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(AStationTimetableBuildable, LinkedStation);
+    DOREPLIFETIME(AStationTimetableBuildable, ReplicatedTimetableData);
+    DOREPLIFETIME(AStationTimetableBuildable, TimetableRevision);
 }
 
 void AStationTimetableBuildable::OnRep_LinkedStation()
 {
     STATION_TIMETABLE_DEV_LOG(Verbose, TEXT("Display %s received linked station %s"), *GetName(), *GetNameSafe(LinkedStation));
+}
+
+void AStationTimetableBuildable::OnRep_TimetableRevision()
+{
+#if !UE_SERVER
+    const bool bNewRevision = LastObservedClientRevision != TimetableRevision;
+    LastObservedClientRevision = TimetableRevision;
+    if (bNewRevision)
+    {
+        STATION_TIMETABLE_DEV_LOG(Display,
+            TEXT("Client observed timetable revision=%u sign=%s station=%s services=%d guid=%u"),
+            TimetableRevision,
+            *GetName(),
+            *ReplicatedTimetableData.StationName.ToString(),
+            ReplicatedTimetableData.Trains.Num(),
+            mCachedGUID);
+    }
+    FPrefabSignData SignData;
+    GetSignPrefabData(SignData);
+    SignData.PrefabLayout = TimetableWidgetLayout;
+    SignData.SignTypeDesc = TimetableSignTypeClass;
+    ReplicatedTimetableData.WriteToSignData(SignData);
+    if (bNewRevision)
+    {
+        STATION_TIMETABLE_DEV_LOG(Display,
+            TEXT("Client received timetable revision=%u sign=%s; Vanilla sign replication owns rendering guid=%u"),
+            TimetableRevision,
+            *GetName(),
+            mCachedGUID);
+    }
+#endif
 }
 
 bool AStationTimetableBuildable::IsSignEditorOpen() const
@@ -373,7 +387,7 @@ AFGBuildableRailroadStation* AStationTimetableBuildable::FindNearestStation(cons
 
 void AStationTimetableBuildable::RefreshTimetableData()
 {
-    if (IsSignEditorOpen())
+    if (!HasAuthority() && IsSignEditorOpen())
     {
         if (!bRefreshPausedForInteraction)
         {
@@ -390,11 +404,17 @@ void AStationTimetableBuildable::RefreshTimetableData()
             TEXT("Resumed timetable updates after sign editor closed: %s"), *GetName());
     }
 
-    if (HasAuthority() && IsBuildableInsideBlueprintDesigner())
+    if (!HasAuthority())
+    {
+        OnRep_TimetableRevision();
+        return;
+    }
+
+    if (IsBuildableInsideBlueprintDesigner())
     {
         LinkedStation = nullptr;
     }
-    else if (HasAuthority() && !IsValid(LinkedStation))
+    else if (!IsValid(LinkedStation))
     {
         LinkedStation = FindNearestStation(this, GetActorLocation());
     }
@@ -426,6 +446,8 @@ void AStationTimetableBuildable::RefreshTimetableData()
             const FTimeTableStop CurrentStop = TimeTable->GetStop(CurrentStopIndex);
             Row.DockedHere = Train->IsDocked() && Train->mDockedAtStation == LinkedStation;
             Row.HeadsHere = CurrentStop.Station == Identifier;
+            Row.DestinationIsConnectedStation = CurrentStop.Station &&
+                (CurrentStop.Station == Identifier || CurrentStop.Station->GetStation() == LinkedStation);
             Row.NextStop = CurrentStop.Station ? CurrentStop.Station->GetStationName().ToString() :
                 NSLOCTEXT("StationTimetable", "UnknownDestination", "Unknown").ToString();
             Row.EstimatedSeconds = EstimateArrivalSeconds(Train, Stops, CurrentStopIndex, Identifier);
@@ -462,7 +484,9 @@ void AStationTimetableBuildable::RefreshTimetableData()
         const FServiceRow& Service = OrderedServices[Index];
         FStationTimetableTrainDisplayData& Train = DisplayData.Trains.AddDefaulted_GetRef();
         Train.TrainName = Service.Train->GetTrainName();
-        Train.Destination = FText::FromString(Service.NextStop);
+        Train.Destination = Service.DestinationIsConnectedStation
+            ? FText::FromString(TEXT("{THIS_STATION}"))
+            : FText::FromString(Service.NextStop);
         Train.Eta = FText::FromString(EtaText(Service));
         Train.Status = Index == 0
             ? TrainStatus(Service)
@@ -486,81 +510,61 @@ void AStationTimetableBuildable::RefreshTimetableData()
         STATION_TIMETABLE_DEV_LOG(Display,
             TEXT("Preserving %d loaded timetable services for %s until railroad data is ready"),
             ExistingServiceCount, *GetName());
+        DisplayData = FStationTimetableDisplayData::FromSignData(SignData);
     }
     if (!bInitialPublish && SignData.TextElementData.OrderIndependentCompareEqual(LastPublishedTimetableData))
     {
-#if !UE_SERVER
-        UpdateRenderedTimetable(SignData);
-#endif
         return;
     }
+
+    const double CurrentTimeSeconds = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0;
+    if (!bInitialPublish && CurrentTimeSeconds - LastTimetablePublishTimeSeconds < MinimumSignPublishIntervalSeconds)
+    {
+        return;
+    }
+
+#if !UE_BUILD_SHIPPING
+    if (!bInitialPublish)
+    {
+        for (const TPair<FString, FString>& Entry : SignData.TextElementData)
+        {
+            const FString* PreviousValue = LastPublishedTimetableData.Find(Entry.Key);
+            if (!PreviousValue || *PreviousValue != Entry.Value)
+            {
+                STATION_TIMETABLE_DEV_LOG(Verbose,
+                    TEXT("Timetable change %s key=%s old='%s' new='%s'"),
+                    *GetName(), *Entry.Key, PreviousValue ? **PreviousValue : TEXT("<missing>"), *Entry.Value);
+                break;
+            }
+        }
+    }
+#endif
     LastPublishedTimetableData = SignData.TextElementData;
     bHasPublishedTimetableData = true;
-
-    if (bInitialPublish && HasAuthority())
+    LastTimetablePublishTimeSeconds = CurrentTimeSeconds;
+    ReplicatedTimetableData = DisplayData;
+    ++TimetableRevision;
+    FlushNetDormancy();
+    ForceNetUpdate();
+#if UE_SERVER
+    if constexpr (StationTimetableDevelopmentDiagnostics)
     {
-        STATION_TIMETABLE_DEV_LOG(Display,
-            TEXT("Publishing initial timetable %s station=%s entries=%d services=%s previousGuid=%u"),
+        UE_LOG(LogStationTimetable, Display,
+            TEXT("Replicated timetable revision=%u sign=%s station=%s services=%d nextEta=%s"),
+            TimetableRevision,
             *GetName(),
-            *GetNameSafe(LinkedStation),
-            SignData.TextElementData.Num(),
-            *SignData.TextElementData.FindRef(TEXT("ServiceCount")),
-            mCachedGUID);
-        SetPrefabSignData(SignData, false);
-    }
-
-#if !UE_SERVER
-    if (!UpdateRenderedTimetable(SignData))
-    {
-        STATION_TIMETABLE_DEV_LOG(VeryVerbose,
-            TEXT("Deferred in-place timetable update for %s guid=%u because its pooled widget is not available"),
-            *GetName(), mCachedGUID);
+            *DisplayData.StationName.ToString(),
+            DisplayData.Trains.Num(),
+            DisplayData.Trains.IsEmpty() ? TEXT("-") : *DisplayData.Trains[0].Eta.ToString());
     }
 #endif
-}
 
-#if !UE_SERVER
-bool AStationTimetableBuildable::UpdateRenderedTimetable(const FPrefabSignData& SignData)
-{
-    if (!GetWorld() || mCachedGUID == 0)
-    {
-        SetRendererDiagnosticState(0, TEXT("no valid world or cached GUID"));
-        return false;
-    }
-    AFGSignSubsystem* SignSubsystem = AFGSignSubsystem::Get(GetWorld());
-    if (!IsValid(SignSubsystem))
-    {
-        SetRendererDiagnosticState(1, TEXT("sign subsystem unavailable"));
-        return false;
-    }
-    UWidgetComponent* WidgetComponent = SignSubsystem->GetWidgetByGUID(mCachedGUID);
-    if (!IsValid(WidgetComponent))
-    {
-        SetRendererDiagnosticState(2, TEXT("pooled widget component unavailable"));
-        return false;
-    }
-    UUserWidget* RootWidget = WidgetComponent->GetUserWidgetObject();
-    if (!IsValid(RootWidget))
-    {
-        SetRendererDiagnosticState(3, TEXT("pooled root widget unavailable"));
-        return false;
-    }
-    UStationTimetableWidget* TimetableWidget = FindTimetableWidget(RootWidget);
-    if (!IsValid(TimetableWidget))
-    {
-        SetRendererDiagnosticState(4, TEXT("StationTimetable widget not found in pooled widget tree"));
-        return false;
-    }
-    TimetableWidget->SetTimetableData(SignData);
-    SetRendererDiagnosticState(5, TEXT("connected"));
-    return true;
-}
-
-void AStationTimetableBuildable::SetRendererDiagnosticState(uint8 NewState, const TCHAR* Description)
-{
-    if (RendererDiagnosticState == NewState) return;
-    RendererDiagnosticState = NewState;
     STATION_TIMETABLE_DEV_LOG(Display,
-        TEXT("In-place renderer %s for %s guid=%u"), Description, *GetName(), mCachedGUID);
+        TEXT("Publishing timetable update %s station=%s entries=%d services=%s previousGuid=%u"),
+        *GetName(),
+        *GetNameSafe(LinkedStation),
+        SignData.TextElementData.Num(),
+        *SignData.TextElementData.FindRef(TEXT("ServiceCount")),
+        mCachedGUID);
+    SetPrefabSignData(SignData, false);
 }
-#endif

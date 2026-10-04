@@ -53,7 +53,10 @@ FStationTimetableDisplayData FStationTimetableDisplayData::FromSignData(const FP
         const FString Prefix = FString::Printf(TEXT("Train%d"), Index);
         FStationTimetableTrainDisplayData& Train = Result.Trains.AddDefaulted_GetRef();
         Train.TrainName = FText::FromString(Data.FindRef(Prefix + TEXT("Name")));
-        Train.Destination = FText::FromString(Data.FindRef(Prefix + TEXT("Destination")));
+        const FString Destination = Data.FindRef(Prefix + TEXT("Destination"));
+        Train.Destination = Destination == TEXT("{THIS_STATION}")
+            ? NSLOCTEXT("StationTimetable", "ThisStation", "This station")
+            : FText::FromString(Destination);
         Train.Eta = FText::FromString(Data.FindRef(Prefix + TEXT("Eta")));
         Train.Status = StatusFromString(Data.FindRef(Prefix + TEXT("Symbol")));
     }
