@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.6
+
+- Fixed live timetable text and ETA updates on existing displays.
+- Reused the persistent Vanilla sign widget and render target instead of rebuilding sign presets.
+- Added an explicit render-target refresh after changed timetable data is applied.
+- Reduced the timetable refresh interval from two seconds to one second.
+- Prevented recurring StationTimetable widget and UObject creation during live updates.
+- Improved marquee sizing without repeatedly generating font atlas entries.
+- Kept development HUD and verbose UObject diagnostics disabled in public Alpha builds.
+
+## 0.2.5
+
+- Replaced exhaustive marquee font measurement with a bounded height-based font size calculation.
+- Prevented StationTimetable marquees from exhausting Slate font atlases and triggering global widget invalidation.
+- Stabilized empty station displays so unchanged displays without train services are not repeatedly published.
+- Improved UObject diagnostics to distinguish live objects from reserved object slots.
+- Reused each sign's persistent Vanilla widget component for timetable updates instead of rebuilding sign presets.
+- Applied replicated timetable revisions directly to the existing renderer on clients and listen servers.
+
 ## 0.2.4
 
 - Fixed timetable displays not refreshing after their initial placement.

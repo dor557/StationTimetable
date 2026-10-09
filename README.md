@@ -83,7 +83,7 @@ Do not create a Game localization target. Plugin localization targets are packag
 
 ## Current Public Version
 
-- Semantic version: `0.2.4`
+- Semantic version: `0.2.6`
 - Release stage: `Alpha`
 - Minimum game build: `502094`
 - Required SML range: `^3.12.0`

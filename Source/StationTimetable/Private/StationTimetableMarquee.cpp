@@ -4,8 +4,6 @@
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 
-#include "Framework/Application/SlateApplication.h"
-#include "Fonts/FontMeasure.h"
 
 void UStationTimetableMarquee::NativeOnInitialized()
 {
@@ -26,46 +24,14 @@ void UStationTimetableMarquee::UpdateFontSize(float AvailableHeight)
         return;
     }
 
-    if (!FSlateApplication::IsInitialized())
-    {
-        return;
-    }
-
-    const TSharedPtr<FSlateFontMeasure> FontMeasure =
-        FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
-
-    if (!FontMeasure.IsValid())
-    {
-        return;
-    }
-
     const float TargetHeight =
         FMath::Max(1.0f, AvailableHeight - (VerticalPadding * 2.0f));
-
-    FSlateFontInfo Font = TextBlock->GetFont();
-
-    // Größte Schriftgröße suchen, deren tatsächlich gemessene
-    // Texthöhe noch in unseren verfügbaren Bereich passt.
-    int32 BestFontSize = 8;
-
-    for (int32 TestSize = 8; TestSize <= 256; ++TestSize)
-    {
-        Font.Size = TestSize;
-
-        const FVector2D MeasuredSize =
-            FontMeasure->Measure(TextBlock->GetText(), Font);
-
-        if (MeasuredSize.Y > TargetHeight)
-        {
-            break;
-        }
-
-        BestFontSize = TestSize;
-    }
+    const int32 EstimatedFontSize = FMath::RoundToInt(TargetHeight * 0.75f);
+    const int32 BestFontSize = FMath::Clamp(((EstimatedFontSize + 1) / 2) * 2, 8, 128);
 
     if (BestFontSize != AppliedFontSize)
     {
-        Font = TextBlock->GetFont();
+        FSlateFontInfo Font = TextBlock->GetFont();
         Font.Size = BestFontSize;
 
         TextBlock->SetFont(Font);

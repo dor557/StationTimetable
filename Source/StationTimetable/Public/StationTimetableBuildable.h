@@ -9,6 +9,7 @@ class AFGBuildableRailroadStation;
 class UFGSignPrefabWidget;
 class UFGSignTypeDescriptor;
 class UStaticMeshComponent;
+class UWidgetComponent;
 
 UCLASS()
 class STATIONTIMETABLE_API AStationTimetableBuildable final : public AFGBuildableWidgetSign
@@ -35,6 +36,9 @@ public:
 private:
     void RefreshTimetableData();
     bool IsSignEditorOpen() const;
+#if !UE_SERVER
+    bool UpdateRuntimeWidget();
+#endif
 
     UFUNCTION()
     void OnRep_LinkedStation();
@@ -62,12 +66,13 @@ private:
 
     TObjectPtr<AFGBuildableRailroadStation> LinkedStationBeforeBlueprintSerialization;
 
-    TMap<FString, FString> LastPublishedTimetableData;
     bool bHasPublishedTimetableData = false;
     bool bRefreshPausedForInteraction = false;
-    double LastTimetablePublishTimeSeconds = -TNumericLimits<double>::Max();
 #if !UE_SERVER
     uint32 LastObservedClientRevision = MAX_uint32;
+    uint32 LastAppliedRuntimeRevision = MAX_uint32;
+    uint32 LastRuntimeDiagnosticRevision = MAX_uint32;
+    TWeakObjectPtr<UWidgetComponent> LastRuntimeWidgetComponent;
 #endif
     FTimerHandle RefreshTimer;
 };

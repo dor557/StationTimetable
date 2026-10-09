@@ -84,7 +84,7 @@ namespace
             TickerHandle = FTSTicker::GetCoreTicker().AddTicker(
                 FTickerDelegate::CreateRaw(this, &FStationTimetableUObjectCreationListener::Report), 60.0f);
 #if !UE_SERVER
-            LastObjectCount = GUObjectArray.GetObjectArrayNum();
+            LastLiveObjectCount = GUObjectArray.GetObjectArrayNumMinusAvailable();
             HudTickerHandle = FTSTicker::GetCoreTicker().AddTicker(
                 FTickerDelegate::CreateRaw(this, &FStationTimetableUObjectCreationListener::UpdateHud), 1.0f);
             DrawDebugDelegateHandle = UDebugDrawService::Register(
@@ -170,9 +170,10 @@ namespace
 #if !UE_SERVER
         bool UpdateHud(float DeltaTime)
         {
-            const int32 ObjectCount = GUObjectArray.GetObjectArrayNum();
-            const int32 SlotDelta = ObjectCount - LastObjectCount;
-            LastObjectCount = ObjectCount;
+            const int32 LiveObjectCount = GUObjectArray.GetObjectArrayNumMinusAvailable();
+            const int32 ObjectSlots = GUObjectArray.GetObjectArrayNum();
+            const int32 LiveDelta = LiveObjectCount - LastLiveObjectCount;
+            LastLiveObjectCount = LiveObjectCount;
 
             int64 CreatedThisSecond = 0;
             {
@@ -181,15 +182,16 @@ namespace
                 CreatedSinceLastHudUpdate = 0;
             }
 
-            const float UsagePercent = 100.0f * static_cast<float>(ObjectCount) /
+            const float UsagePercent = 100.0f * static_cast<float>(LiveObjectCount) /
                 static_cast<float>(MaximumUObjectSlots);
             const FColor DisplayColor = FColor::White;
             const FString Message = FString::Printf(
-                TEXT("UObjects: %d / %d (%.1f%%) | Slots %+d/s | Created %lld/s"),
-                ObjectCount,
+                TEXT("Live UObjects: %d / %d (%.1f%%) | Live %+d/s | Slots %d | Created %lld/s"),
+                LiveObjectCount,
                 MaximumUObjectSlots,
                 UsagePercent,
-                SlotDelta,
+                LiveDelta,
+                ObjectSlots,
                 CreatedThisSecond);
             {
                 FScopeLock Lock(&Mutex);
@@ -293,7 +295,7 @@ namespace
         bool bRegistered = false;
         FTSTicker::FDelegateHandle TickerHandle;
 #if !UE_SERVER
-        int32 LastObjectCount = 0;
+        int32 LastLiveObjectCount = 0;
         FString HudMessage;
         FColor HudColor = FColor::Green;
         FTSTicker::FDelegateHandle HudTickerHandle;
